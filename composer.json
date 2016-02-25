@@ -1,0 +1,14 @@
+{
+    "name": "kamataryo/term-synonyms",
+    "type": "wordpress-plugin",
+    "require": {
+        "ginq/ginq": "^0.2.4"
+    },
+    "license": "GPL",
+    "authors": [
+        {
+            "name": "KamataRyo",
+            "email": "mugil.cephalus@gmail.com"
+        }
+    ]
+}
