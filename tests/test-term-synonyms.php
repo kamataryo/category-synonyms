@@ -1,27 +1,33 @@
 <?php
 
 class TermSynonymsTest extends WP_UnitTestCase {
-	const the_TEXTDOMAIN = 'term_synonyms';
+
 	private $termSynonyms;
 	private $post_type;
 
-	function __construct() {
+
+	function __construct()
+	{
 		global $termSynonyms_instance;
 		$this->termSynonyms = $termSynonyms_instance;
 		$this->post_type = $termSynonyms_instance->post_type;
 	}
 
 
-	function test_if_module_Ginq_loaded() {
-		$the_array = array( 1,2,3,4,5,6,7,8,9,10 );
-		$result = Ginq::from( $the_array )
-			->where( function( $x ) {return  $x % 3 === 0; } )
-			->select( function( $x ) {return $x; } )
+	//for my training
+	function test_if_module_Ginq_loaded()
+	{
+		$result = Ginq::from( array( 1,2,3,4,5,6,7,8,9 ) )
+			->where( function( $x ){return  $x % 3 === 0; } )
+			->select( function( $x ){return $x; } )
 			->toList();
+
 		$this->assertEquals( $result, array( 3, 6, 9 ) );
 	}
 
-	function test_custom_post_type_registration() {
+
+	function test_custom_post_type_registration()
+	{
 		// [appearance] it should be that the singleton instance exists.
 		$this->assertNotNull( $this->termSynonyms );
 
@@ -30,193 +36,210 @@ class TermSynonymsTest extends WP_UnitTestCase {
 	}
 
 
-	function test_if_custom_taxonomy_registered_for_custom_post_type() {
-		// [appearance] it should be that the singleton instance exists.
-		// it have been tested already.
-
+	function test_if_custom_taxonomy_registered_for_custom_post_type()
+	{
 		// [behavior] it should be that the custop post type have been linked with all the default taxonomies.
 		$this->assertEquals(
-			json_encode( array_keys( get_taxonomies() ) ),
-			json_encode( get_object_taxonomies( $this->post_type ) )
+			array_keys( get_taxonomies() ),
+			get_object_taxonomies( $this->post_type )
 		);
+
 	}
 
 
-	function test_for_synonyms_registration_and_unregistration() {
+	function test_for_synonyms_registration_and_unregistration()
+	{
 		//provisioning
 		$ts = $this->termSynonyms;
-		$synonyms = array(
-			"category" => array( 'white', 'bianco', 'weiss', 'abyad', '白' ),
-			"post_tag" => array( '#FFF', '#ffffff', 'rgb(255,255,255)' )
-		);
+
+		$synonymous_terms = array( 'white', 'bianco', 'weiss', 'abyad', '白' );
+		$tax_name = 'category';
+
 		// `synonyms_id` is `post_id`
-		$synonyms_id = $ts->register( $synonyms, 'synonym label in test to identifiy the synonym group' );
+		$registration_info = $ts->register( array(
+			'label'    => 'synonym label in test to identifiy the synonym group',
+			'terms'    => $synonymous_terms,
+			'taxonomy' => $tax_name,
+		) );
 
 
-		// describe register test
+		// describe registration test
 
-		// [appearance] it should that the function returns effective post_id;
-		$this->assertNotFalse( $synonyms_id );
-		$this->assertInternalType ('integer', $synonyms_id );
+		// [appearance] it should be that register returns 3element array of synonyms_definition_id, concerned taxonomy name and array of registerd term_taxonomy_ids.;
+		$this->assertEquals(
+			array_keys( $registration_info ),
+			array( 'synonyms_definition_id', 'taxonomy', 'term_taxonomy_ids' )
+		);
+
+		// [appearance] it should be that syonnyms_id is integer if success
+		$this->assertInternalType ('integer', $registration_info['synonyms_definition_id'] );
+		$this->assertNotEquals( 0, $registration_info['synonyms_definition_id'] );
+
+		// [appearance] taxonomy name should be returened directly.
+		$this->assertEquals($tax_name, $registration_info['taxonomy']);
+		// [appearance] also the taxnomy name should be set as custom field.
+		$this->assertEquals($tax_name, get_post_meta(
+			$registration_info['synonyms_definition_id'],
+			TERM_SYNONYMS_TAXONOMY_FIELD_KEY,
+			true
+		) );
+
+		// check if same amount of ids has been returened.
+		foreach ( $registration_info['term_taxonomy_ids'] as $index => $combind_term_taxonomy_id ) {
+
+			$this->assertInternalType( 'integer', $combind_term_taxonomy_id['term_id'] );
+			$this->assertInternalType( 'integer', $combind_term_taxonomy_id['term_taxonomy_id'] );
+
+			$this->assertEquals(
+				$synonymous_terms[$index],
+				get_term_by( 'id', $combind_term_taxonomy_id['term_taxonomy_id'], $tax_name )->name
+			);
+
+		}
 
 		// [behavior] it should be that terms have been generated after registration
-		foreach ( $synonyms as $taxonomy => $terms ) {
-			foreach ( $terms as $term ) {
-				$result = term_exists( $term, $taxonomy );
-				// negative result of `term_exists` is 0 or null
-				$this->assertNotFalse ( $result );
-				$this->assertNotNull ( $result );
-			}
+		foreach ( $synonymous_terms as $term ){
+
+			// negative result of `term_exists` is 0 or null
+			$this->assertNotFalse ( term_exists( $term, $tax_name ) );
+
+			$this->assertNotNull ( term_exists( $term, $tax_name ) );
+
 		}
 
 		// [behavior] it should be that a custom post have been generated.
-		$this->assertNotFalse( get_post_status( $synonyms_id ) );
-		$this->assertEquals( get_post_type( $synonyms_id ), $this->post_type );
+		$this->assertNotFalse( get_post_status( $registration_info['synonyms_definition_id'] ) );
+
+		$this->assertEquals( get_post_type( $registration_info['synonyms_definition_id'] ), $this->post_type );
 
 
 		// [behavior] it should be that the post have been attached all the terms
-		foreach ( $synonyms as $taxonomy => $terms ) {
-			foreach ( $terms as $term ) {
-				$this->assertTrue ( has_term( $term, $taxonomy, $synonyms_id ) );
-			}
+		foreach ( $synonymous_terms as $term ) {
+
+			$this->assertTrue ( has_term( $term, $tax_name, $registration_info['synonyms_definition_id'] ) );
+
 		}
 
 
 		// describe unregister test
-		$result = $ts->unregister( $synonyms_id );
+		$unregistration_info = $ts->unregister( $registration_info['synonyms_definition_id'] );
 
 		// [appearance] it should be that the function returns copied deleted post object.
-		$this->assertNotFalse( $result );
+		$this->assertNotFalse( $unregistration_info );
 
 		// [behavior] it should be that the post have been deleted.
-		$this->assertFalse( get_post_status( $synonyms_id ) );
+		$this->assertFalse( get_post_status( $unregistration_info->ID ) );
 	}
 
 
-
-
-	function test_if_synonyms_list_is_readable() {
+	function test_of_get_synonyms_definition_by_id()
+	{
 		//provisioning
 		$ts = $this->termSynonyms;
-		$synonyms = array(
-			"category" => array( 'wine', 'ワイン' ),
-			"post_tag" => array('liquor made from grape', 'red and white', 'even rose' )
-		);
+		$synonymous_terms = array( 'wine', 'ワイン' );
+		$tax_name = 'category';
 
+		$registration_info = $ts->register( array(
+			'label' => 'synonym label in test to read the synonym group',
+			'taxonomy' => $tax_name,
+			'terms' => $synonymous_terms,
+		) );
 
-		// `synonyms_id` is `post_id`
-		$synonyms_id = $ts->register( $synonyms, 'synonym label in test to read the synonym group' );
-		$result = $ts->read( $synonyms_id );
+		$result = $ts->get_synonyms_definition_by_id( $registration_info['synonyms_definition_id'] );
 
-		$taxonomies_expected = array_keys( $synonyms );
-		$taxonomies_actual = array_keys( $result );
-		sort( $taxonomies_expected );
-		sort( $taxonomies_actual );
-
-		// [appearance] it should read() returns $synonyms object.
-		$this->assertEquals(
-			json_encode( $taxonomies_expected ),
-			json_encode( $taxonomies_actual )
-		);
-		// check nested values in synonym object.
-		foreach ( $taxonomies_expected as $taxonomy ) {
-			$terms_expected = $synonyms[ $taxonomy ];
-			$terms_actual = $result[ $taxonomy ];
-			sort( $terms_expected );
-			sort( $terms_actual );
-			$this->assertEquals(
-				json_encode( ( $terms_expected ) ),
-				json_encode( ( $terms_actual ) )
-			);
-		}
+		$this->assertEquals( count( $result['term_taxonomy_ids'] ), count( $synonymous_terms ) );
+		$this->assertEquals( $result['taxonomy'], $tax_name );
 
 		// clean up for next test.
-		$ts->unregister( $synonyms_id );
+		$ts->unregister( $registration_info['synonyms_definition_id'] );
 	}
 
 
-
-	function test_of_function_synonymsOf() {
+	function test_of_get_synonymous_terms_by()
+	{
 		//provisioning
 		$ts = $this->termSynonyms;
-		$synonyms1 = array(
-			'category' => array( 'mocha' ),
-			'post_tag' => array( 'qafa', 'the bitter drink', 'my favorite' )
+		$args = array(
+			array(
+				'taxonomy' => 'category',
+				'terms'    => array( 'mocha', 'coffee' ),
+			),
+			array(
+				'taxonomy' => 'category',
+				'terms' => array( 'coffee', 'qafa' ),
+			),
 		);
-		$synonyms2 = array(
-			'category' => array( 'coffee' ),
-			'post_tag' => array( 'qafa' )
-		);
-		// this is 2nd level of adjacency, which does not affect.
-		$synonyms3 = array(
-			'category' => array( 'coffee' ),
-			'post_tag' => array( 'the cafeine' )
-		);
-		$synonym_id1 = $ts->register( $synonyms1, 'synonym label1 in test for synonymsOf' );
-		$synonym_id2 = $ts->register( $synonyms2, 'synonym label2 in test for synonymsOf' );
-
-		$expected = array(
-			'category' => array( 'mocha', 'coffee' ),
-			'post_tag' => array( 'qafa', 'the bitter drink', 'my favorite' )
-		);
-
-		$actual = $ts->synonymsOf( 'qafa', 'post_tag' );
-		sort( $expected['category'] );
-		sort( $expected['post_tag'] );
-		sort( $actual['category'] );
-		sort( $actual['post_tag'] );
+		$infos = array();
+		foreach ( $args as $arg ) {
+			array_push( $infos, $ts->register( $arg ) );
+		}
 
 
-		// [appearance] it should be that function `synonymsOf` returns unioned array.
-		$this->assertEquals(
-			json_encode( ( $expected ) ),
-			json_encode( ( $actual ) )
-		);
+		$result = $ts->get_synonymous_terms_by( array(
+			'field'    => 'name',
+			'value'    => 'coffee',
+			'taxonomy' => 'category',
+		) );
+
+		var_dump($result['term_taxonomy_ids']);
+		$this->assertEquals( count( $result['term_taxonomy_ids'] ), 3 );
+		$this->assertEquals( $result['taxonomy'], 'category' );
+
 
 
 		//clean up
-		$ts->unregister( $synonym_id1 );
-		$ts->unregister( $synonym_id2 );
+		foreach ( $infos as $info ) {
+			$ts->unregister( $info['synonyms_definition_id'] );
+		}
 	}
 
-	function test_get_posts_intercepted() {
-		//provisioning
-		$ts = $this->termSynonyms;
-		$synonyms = array(
-			'category' => array( 'tea', 'chai' )
-		);
-		$synonym_id = $ts->register( $synonyms, 'synonym label in test for query check' );
 
-		wp_insert_post( array(
-			'post_type' => 'post',
-            'post_title' => 'what I love',
-            'post_category' => array( get_cat_ID( 'tea' ) ),
-		) );
-		wp_insert_post( array(
-			'post_type' => 'post',
-			'post_title' => 'my favorite',
-			'post_category' => array( get_cat_ID( 'chai' ) ),
-		) );
-		wp_insert_post( array(
-			'post_type' => 'post',
-			'post_title' => 'only title',
-		) );
-
-		$obtained_posts = get_posts( array(
-			'number_posts' => -1,
-			'post_type'    => 'post',
-			'post_status'  => 'any',
-			'tax_query'    => array(
-				array(
-					'taxonomy' => 'category',
-					'field'    => 'name',
-					'terms'    => 'tea',
-				),
-			),
-		) );
-
-		// [appearance] it should be that 2 posts have been obtained.
-		$this->assertEquals( count( $obtained_posts ), 2 );
-	}
+	// function test_get_posts_intercepted()
+	// {
+	// 	//provisioning
+	// 	$ts = $this->termSynonyms;
+	// 	$synonyms = array(
+	// 		'category' => array( 'tea', 'chai' )
+	// 	);
+	// 	$synonym_id = $ts->register( $synonyms, 'synonym label in test for query check' );
+	//
+	// 	$posts = array(
+	// 		array(
+	// 			'post_type' => 'post',
+	//             'post_title' => 'what I love',
+	//             'post_category' => array( get_cat_ID( 'tea' ) ),
+	// 		),
+	// 		array(
+	// 			'post_type' => 'post',
+	// 			'post_title' => 'my favorite',
+	// 			'post_category' => array( get_cat_ID( 'chai' ) ),
+	// 		),
+	// 		array(
+	// 			'post_type' => 'post',
+	// 			'post_title' => 'only title',
+	// 		)
+	// 	);
+	//
+	// 	foreach ($posts as $post) {
+	// 		wp_insert_post( $post );
+	// 	}
+	//
+	//
+	// 	$obtained_posts = get_posts( array(
+	// 		'number_posts' => -1,
+	// 		'post_type'    => 'post',
+	// 		'post_status'  => 'any',
+	// 		'tax_query'    => array(
+	// 			array(
+	// 				'taxonomy' => 'category',
+	// 				'field'    => 'name',
+	// 				'terms'    => 'tea',
+	// 			),
+	// 		),
+	// 	) );
+	//
+	// 	// [appearance] it should be that 2 posts have been obtained.
+	// 	$this->assertEquals( count( $obtained_posts ), 2 );
+	// }
 
 }
