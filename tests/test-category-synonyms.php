@@ -193,52 +193,46 @@ class CategorySynonymsTest extends WP_UnitTestCase {
 	}
 
 
-	// function test_get_posts_intercepted()
-	// {
-	// 	//provisioning
-	// 	$ts = $this->categorySynonyms;
-	// 	$synonyms = array(
-	// 		'category' => array( 'tea', 'chai' )
-	// 	);
-	// 	$synonym_id = $ts->register( $synonyms, 'synonym label in test for query check' );
-	//
-	// 	$posts = array(
-	// 		array(
-	// 			'post_type' => 'post',
-	//             'post_title' => 'what I love',
-	//             'post_category' => array( get_cat_ID( 'tea' ) ),
-	// 		),
-	// 		array(
-	// 			'post_type' => 'post',
-	// 			'post_title' => 'my favorite',
-	// 			'post_category' => array( get_cat_ID( 'chai' ) ),
-	// 		),
-	// 		array(
-	// 			'post_type' => 'post',
-	// 			'post_title' => 'only title',
-	// 		)
-	// 	);
-	//
-	// 	foreach ($posts as $post) {
-	// 		wp_insert_post( $post );
-	// 	}
-	//
-	//
-	// 	$obtained_posts = get_posts( array(
-	// 		'number_posts' => -1,
-	// 		'post_type'    => 'post',
-	// 		'post_status'  => 'any',
-	// 		'tax_query'    => array(
-	// 			array(
-	// 				'taxonomy' => 'category',
-	// 				'field'    => 'name',
-	// 				'terms'    => 'tea',
-	// 			),
-	// 		),
-	// 	) );
-	//
-	// 	// [appearance] it should be that 2 posts have been obtained.
-	// 	$this->assertEquals( count( $obtained_posts ), 2 );
-	// }
+	function test_get_posts_interception()
+	{
+		//provisioning
+		$this->categorySynonyms->register( array(
+			'taxonomy' => 'category',
+			'terms'    => array( 'tea', 'chai' ),
+		) );
+
+		$posts = array(
+			array(
+				'post_type' => 'post',
+	            'post_title' => 'what I love',
+	            'post_category' => array( get_cat_ID( 'tea' ) ),
+			),
+			array(
+				'post_type' => 'post',
+				'post_title' => 'my favorite',
+				'post_category' => array( get_cat_ID( 'chai' ) ),
+			),
+			array(
+				'post_type' => 'post',
+				'post_title' => 'only title',
+			)
+		);
+
+		$inserted_posts = array();
+		foreach ($posts as $post) {
+			array_push( $inserted_posts, wp_insert_post( $post ) );
+		}
+
+
+		$obtained_posts = get_posts( array(
+			'number_posts' => -1,
+			'post_type'    => 'post',
+			'post_status'  => 'any',
+			'category'     => get_cat_ID( 'tea' ),
+		) );
+
+		// [appearance] it should be that 2 posts have been obtained.
+		$this->assertEquals( count( $obtained_posts ), 2 );
+	}
 
 }

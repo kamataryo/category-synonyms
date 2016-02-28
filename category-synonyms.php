@@ -22,11 +22,6 @@ define( 'CATEGORY_SYNONYMS_TAXONOMY_FIELD_KEY', 'term_synonyms_primary_taxonomy_
 
 $categorySynonyms_instance = new TermSynonyms( CATEGORY_SYNONYMS_POST_TYPE );
 
-#todos
-# done- class内部からカスタム投稿タイプを作成
-# done- 作った投稿タイプに対して全てのタクソノミーを有効化(register taxonomy hook)
-# - synonymsを登録した時に、1つのリストの中で　重複していたらどうなる？
-
 
 class TermSynonyms {
 
@@ -86,26 +81,23 @@ class TermSynonyms {
 
     public function add_synonyms_pre_get_posts( $query )
     {
-        if( ! $query->is_admin() && $query->is_category() ){
-            if ($query->query[ 'post_type']  === $this->post_type) {
-                return;
-            }
+        if( ! $query->is_admin() &&
+            ( $query->query['post_type']  !== $this->post_type ) ){  //avoid inner call
+            if( $query->is_category() ) {
+                $old_cat = explode( ',', $query->get( 'cat' ) );
 
-            # ここでしたいこと
-            # tax_queryを改変して、全てのシノニムを追加したい
-
-            # tax_query => terms => (全てのsynonymous termsへ変換) => 結合 => 重複削除
-
-
-            $queries = $query->tax_query->queries;
-            foreach ($queries as $query) {
-                $taxonomy = $query[ 'taxonomy' ];
-                foreach ( $query[ 'terms' ] as $term ) {
-                    $synonyms_of_each_tax = $this->get_synonymous_terms_by('name', $term, $taxonomy );
-                    foreach ($synonyms_of_each_tax as $taxonomy => $synonyms ) {
-                        // $query->tax_query->queries[ $taxonomy ] = array_merge($query->tax_query->queries[ $taxonomy ], $synonyms );
+                $flatten_terms = array();
+                foreach ( $old_cat as $term_id ) {
+                    $synonymous_terms = $this->get_synonymous_terms_by( array(
+                        'field' => 'id',
+                        'taxonomy' => 'category',
+                        'value' => $term_id,
+                    ) );
+                    foreach ( $synonymous_terms['term_taxonomy_ids'] as $tt_id ) {
+                        array_push( $flatten_terms, $tt_id );
                     }
                 }
+                $query->set('cat',join(array_unique( $flatten_terms ),','));
             }
         }
     }
@@ -120,7 +112,7 @@ class TermSynonyms {
         }
 
         $default = array(
-            'label' => _x( 'no synonyms definition label', CATEGORY_SYNONYMS_TEXT_DOMAIN ),
+            'label' => __( 'no synonyms definition label', CATEGORY_SYNONYMS_TEXT_DOMAIN ),
             'taxonomy' => CATEGORY_SYNONYMS_DEFAULT_TAXONOMY,
         );
         $arg = array_merge( $default, $arg );
