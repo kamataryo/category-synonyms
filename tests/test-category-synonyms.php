@@ -63,72 +63,73 @@ class CategorySynonymsTest extends WP_UnitTestCase {
 		) );
 
 
-		// describe registration test
+			// describe registration test
 
-		// [appearance] it should be that register returns 3element array of synonyms_definition_id, concerned taxonomy name and array of registerd term_taxonomy_ids.;
-		$this->assertEquals(
-			array_keys( $registration_info ),
-			array( 'synonyms_definition_id', 'taxonomy', 'term_taxonomy_ids' )
-		);
-
-		// [appearance] it should be that syonnyms_id is integer if success
-		$this->assertInternalType ('integer', $registration_info['synonyms_definition_id'] );
-		$this->assertNotEquals( 0, $registration_info['synonyms_definition_id'] );
-
-		// [appearance] taxonomy name should be returened directly.
-		$this->assertEquals($tax_name, $registration_info['taxonomy']);
-		// [appearance] also the taxnomy name should be set as custom field.
-		$this->assertEquals($tax_name, get_post_meta(
-			$registration_info['synonyms_definition_id'],
-			CATEGORY_SYNONYMS_TAXONOMY_FIELD_KEY,
-			true
-		) );
-
-		// check if same amount of ids has been returened.
-		foreach ( $registration_info['term_taxonomy_ids'] as $index => $combind_term_taxonomy_id ) {
-
-			$this->assertInternalType( 'integer', $combind_term_taxonomy_id['term_id'] );
-			$this->assertInternalType( 'integer', $combind_term_taxonomy_id['term_taxonomy_id'] );
-
+			// [appearance] it should be that register returns 3element array of synonyms_definition_id, concerned taxonomy name and array of registerd term_taxonomy_ids.;
 			$this->assertEquals(
-				$synonymous_terms[$index],
-				get_term_by( 'id', $combind_term_taxonomy_id['term_taxonomy_id'], $tax_name )->name
+				array_keys( $registration_info ),
+				array( 'synonyms_definition_id', 'taxonomy', 'term_taxonomy_ids' )
 			);
 
-		}
+			// [appearance] it should be that syonnyms_id is integer if success
+			$this->assertInternalType ('integer', $registration_info['synonyms_definition_id'] );
+			$this->assertNotEquals( 0, $registration_info['synonyms_definition_id'] );
 
-		// [behavior] it should be that terms have been generated after registration
-		foreach ( $synonymous_terms as $term ){
+			// [appearance] taxonomy name should be returened directly.
+			$this->assertEquals($tax_name, $registration_info['taxonomy']);
+			// [appearance] also the taxnomy name should be set as custom field.
+			$this->assertEquals($tax_name, get_post_meta(
+				$registration_info['synonyms_definition_id'],
+				CATEGORY_SYNONYMS_TAXONOMY_FIELD_KEY,
+				true
+			) );
 
-			// negative result of `term_exists` is 0 or null
-			$this->assertNotFalse ( term_exists( $term, $tax_name ) );
+			// check if same amount of ids has been returened.
+			foreach ( $registration_info['term_taxonomy_ids'] as $index => $combind_term_taxonomy_id ) {
 
-			$this->assertNotNull ( term_exists( $term, $tax_name ) );
+				$this->assertInternalType( 'integer', $combind_term_taxonomy_id['term_id'] );
+				$this->assertInternalType( 'integer', $combind_term_taxonomy_id['term_taxonomy_id'] );
 
-		}
+				$this->assertEquals(
+					$synonymous_terms[$index],
+					get_term_by( 'id', $combind_term_taxonomy_id['term_taxonomy_id'], $tax_name )->name
+				);
 
-		// [behavior] it should be that a custom post have been generated.
-		$this->assertNotFalse( get_post_status( $registration_info['synonyms_definition_id'] ) );
+			}
 
-		$this->assertEquals( get_post_type( $registration_info['synonyms_definition_id'] ), $this->post_type );
+			// [behavior] it should be that terms have been generated after registration
+			foreach ( $synonymous_terms as $term ){
+
+				// negative result of `term_exists` is 0 or null
+				$this->assertNotFalse ( term_exists( $term, $tax_name ) );
+
+				$this->assertNotNull ( term_exists( $term, $tax_name ) );
+
+			}
+
+			// [behavior] it should be that a custom post have been generated.
+			$this->assertNotFalse( get_post_status( $registration_info['synonyms_definition_id'] ) );
+
+			$this->assertEquals( get_post_type( $registration_info['synonyms_definition_id'] ), $this->post_type );
 
 
-		// [behavior] it should be that the post have been attached all the terms
-		foreach ( $synonymous_terms as $term ) {
+			// [behavior] it should be that the post have been attached all the terms
+			foreach ( $synonymous_terms as $term ) {
 
-			$this->assertTrue ( has_term( $term, $tax_name, $registration_info['synonyms_definition_id'] ) );
+				$this->assertTrue ( has_term( $term, $tax_name, $registration_info['synonyms_definition_id'] ) );
 
-		}
+			}
 
 
-		// describe unregister test
-		$unregistration_info = $ts->unregister( $registration_info['synonyms_definition_id'] );
+			// describe unregister test
+			$unregistration_info = $ts->unregister( $registration_info['synonyms_definition_id'] );
 
-		// [appearance] it should be that the function returns copied deleted post object.
-		$this->assertNotFalse( $unregistration_info );
+			// [appearance] it should be that the function returns copied deleted post object.
+			$this->assertNotFalse( $unregistration_info );
 
-		// [behavior] it should be that the post have been deleted.
-		$this->assertFalse( get_post_status( $unregistration_info->ID ) );
+			// [behavior] it should be that the post have been deleted.
+			$this->assertFalse( get_post_status( $unregistration_info->ID ) );
+
 	}
 
 
@@ -175,6 +176,9 @@ class CategorySynonymsTest extends WP_UnitTestCase {
 		}
 
 
+
+
+
 		$result = $ts->get_synonymous_terms_by( array(
 			'field'    => 'name',
 			'value'    => 'coffee',
@@ -191,48 +195,4 @@ class CategorySynonymsTest extends WP_UnitTestCase {
 			$ts->unregister( $info['synonyms_definition_id'] );
 		}
 	}
-
-
-	function test_get_posts_interception()
-	{
-		//provisioning
-		$this->categorySynonyms->register( array(
-			'taxonomy' => 'category',
-			'terms'    => array( 'tea', 'chai' ),
-		) );
-
-		$posts = array(
-			array(
-				'post_type' => 'post',
-	            'post_title' => 'what I love',
-	            'post_category' => array( get_cat_ID( 'tea' ) ),
-			),
-			array(
-				'post_type' => 'post',
-				'post_title' => 'my favorite',
-				'post_category' => array( get_cat_ID( 'chai' ) ),
-			),
-			array(
-				'post_type' => 'post',
-				'post_title' => 'only title',
-			)
-		);
-
-		$inserted_posts = array();
-		foreach ($posts as $post) {
-			array_push( $inserted_posts, wp_insert_post( $post ) );
-		}
-
-
-		$obtained_posts = get_posts( array(
-			'number_posts' => -1,
-			'post_type'    => 'post',
-			'post_status'  => 'any',
-			'category'     => get_cat_ID( 'tea' ),
-		) );
-
-		// [appearance] it should be that 2 posts have been obtained.
-		$this->assertEquals( count( $obtained_posts ), 2 );
-	}
-
 }

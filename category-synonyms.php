@@ -31,8 +31,7 @@ class TermSynonyms {
     function __construct( $post_type )
     {
         $this->post_type = $post_type;
-        add_action( 'init'         , array( &$this, 'manager_post_type_init' ) );
-        add_action( 'pre_get_posts', array( &$this, 'add_synonyms_pre_get_posts' ) );
+        add_action( 'init', array( &$this, 'manager_post_type_init' ) );
     }
 
 
@@ -77,31 +76,6 @@ class TermSynonyms {
             register_taxonomy_for_object_type( $tax_name, $this->post_type );
         }
     }
-
-
-    public function add_synonyms_pre_get_posts( $query )
-    {
-        if( ! $query->is_admin() &&
-            ( $query->query['post_type']  !== $this->post_type ) ){  //avoid inner call
-            if( $query->is_category() ) {
-                $old_cat = explode( ',', $query->get( 'cat' ) );
-
-                $flatten_terms = array();
-                foreach ( $old_cat as $term_id ) {
-                    $synonymous_terms = $this->get_synonymous_terms_by( array(
-                        'field' => 'id',
-                        'taxonomy' => 'category',
-                        'value' => $term_id,
-                    ) );
-                    foreach ( $synonymous_terms['term_taxonomy_ids'] as $tt_id ) {
-                        array_push( $flatten_terms, $tt_id );
-                    }
-                }
-                $query->set('cat',join(array_unique( $flatten_terms ),','));
-            }
-        }
-    }
-
 
     public function register( $arg )
     {
@@ -220,9 +194,13 @@ class TermSynonyms {
         //flatten term_taonomy_ids
         foreach ($synonyms_definition_ids as $id ) {
             $tt_ids = wp_get_post_terms( $id, $arg['taxonomy'], array('fields' => 'tt_ids' ) );
+
             foreach ($tt_ids as $tt_id) {
+
                 array_push( $result['term_taxonomy_ids'] , $tt_id );
+
             }
+
         }
         $result['term_taxonomy_ids'] = array_unique( $result['term_taxonomy_ids'], SORT_REGULAR );
 
