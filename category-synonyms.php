@@ -1,7 +1,7 @@
 <?php
 /*
-Plugin Name: Term Synonyms
-Plugin URI: http://www.github.com/KamataRyo/term-synonyms
+Plugin Name: Category Synonyms
+Plugin URI: http://www.github.com/KamataRyo/category-synonyms
 Description: define synonymous relationships among terms.
 Author: kamataryo
 Version: 0.0.1
@@ -14,13 +14,13 @@ Author URI: http://www.github.com/KamataRyo/
 require_once dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
 // instansiate the plugin classes
-global $termSynonyms_instance;
-define( 'TERM_SYNONYMS_POST_TYPE', 'synonyms_definition' );
-define( 'TERM_SYNONYMS_TEXT_DOMAIN', 'term_synonyms' );
-define( 'TERM_SYNONYMS_DEFAULT_TAXONOMY', 'category' );
-define( 'TERM_SYNONYMS_TAXONOMY_FIELD_KEY', 'term_synonyms_primary_taxonomy_key' );
+global $categorySynonyms_instance;
+define( 'CATEGORY_SYNONYMS_POST_TYPE', 'synonyms_definition' );
+define( 'CATEGORY_SYNONYMS_TEXT_DOMAIN', 'category_synonyms' );
+define( 'CATEGORY_SYNONYMS_DEFAULT_TAXONOMY', 'category' );
+define( 'CATEGORY_SYNONYMS_TAXONOMY_FIELD_KEY', 'term_synonyms_primary_taxonomy_key' );
 
-$termSynonyms_instance = new TermSynonyms( TERM_SYNONYMS_POST_TYPE );
+$categorySynonyms_instance = new TermSynonyms( CATEGORY_SYNONYMS_POST_TYPE );
 
 #todos
 # done- class内部からカスタム投稿タイプを作成
@@ -44,20 +44,20 @@ class TermSynonyms {
     public function manager_post_type_init()
     {
         $labels = array(
-            'name'               => _x( 'Synonyms', 'post type general name', TERM_SYNONYMS_TEXT_DOMAIN ),
-            'singular_name'      => _x( 'Synonym', 'post type singular name', TERM_SYNONYMS_TEXT_DOMAIN ),
-            'menu_name'          => _x( 'Synonyms', 'admin menu', TERM_SYNONYMS_TEXT_DOMAIN ),
-            'name_admin_bar'     => _x( 'Synonym', 'add new on admin bar', TERM_SYNONYMS_TEXT_DOMAIN ),
-            'add_new'            => _x( 'Add New', 'Synonym', TERM_SYNONYMS_TEXT_DOMAIN ),
-            'add_new_item'       => __( 'Add New Synonym', TERM_SYNONYMS_TEXT_DOMAIN ),
-            'new_item'           => __( 'New Synonym', TERM_SYNONYMS_TEXT_DOMAIN ),
-            'edit_item'          => __( 'Edit Synonym', TERM_SYNONYMS_TEXT_DOMAIN ),
-            'view_item'          => __( 'View Synonym', TERM_SYNONYMS_TEXT_DOMAIN ),
-            'all_items'          => __( 'All Synonyms', TERM_SYNONYMS_TEXT_DOMAIN ),
-            'search_items'       => __( 'Search Synonyms', TERM_SYNONYMS_TEXT_DOMAIN ),
-            'parent_item_colon'  => __( 'Parent Synonyms:', TERM_SYNONYMS_TEXT_DOMAIN ),
-            'not_found'          => __( 'No synonyms found.', TERM_SYNONYMS_TEXT_DOMAIN ),
-            'not_found_in_trash' => __( 'No synonyms found in Trash.', TERM_SYNONYMS_TEXT_DOMAIN )
+            'name'               => _x( 'Synonyms', 'post type general name', CATEGORY_SYNONYMS_TEXT_DOMAIN ),
+            'singular_name'      => _x( 'Synonym', 'post type singular name', CATEGORY_SYNONYMS_TEXT_DOMAIN ),
+            'menu_name'          => _x( 'Synonyms', 'admin menu', CATEGORY_SYNONYMS_TEXT_DOMAIN ),
+            'name_admin_bar'     => _x( 'Synonym', 'add new on admin bar', CATEGORY_SYNONYMS_TEXT_DOMAIN ),
+            'add_new'            => _x( 'Add New', 'Synonym', CATEGORY_SYNONYMS_TEXT_DOMAIN ),
+            'add_new_item'       => __( 'Add New Synonym', CATEGORY_SYNONYMS_TEXT_DOMAIN ),
+            'new_item'           => __( 'New Synonym', CATEGORY_SYNONYMS_TEXT_DOMAIN ),
+            'edit_item'          => __( 'Edit Synonym', CATEGORY_SYNONYMS_TEXT_DOMAIN ),
+            'view_item'          => __( 'View Synonym', CATEGORY_SYNONYMS_TEXT_DOMAIN ),
+            'all_items'          => __( 'All Synonyms', CATEGORY_SYNONYMS_TEXT_DOMAIN ),
+            'search_items'       => __( 'Search Synonyms', CATEGORY_SYNONYMS_TEXT_DOMAIN ),
+            'parent_item_colon'  => __( 'Parent Synonyms:', CATEGORY_SYNONYMS_TEXT_DOMAIN ),
+            'not_found'          => __( 'No synonyms found.', CATEGORY_SYNONYMS_TEXT_DOMAIN ),
+            'not_found_in_trash' => __( 'No synonyms found in Trash.', CATEGORY_SYNONYMS_TEXT_DOMAIN )
         );
         $args = array(
             'labels'             => $labels,
@@ -120,8 +120,8 @@ class TermSynonyms {
         }
 
         $default = array(
-            'label' => _x( 'no synonyms definition label', TERM_SYNONYMS_TEXT_DOMAIN ),
-            'taxonomy' => TERM_SYNONYMS_DEFAULT_TAXONOMY,
+            'label' => _x( 'no synonyms definition label', CATEGORY_SYNONYMS_TEXT_DOMAIN ),
+            'taxonomy' => CATEGORY_SYNONYMS_DEFAULT_TAXONOMY,
         );
         $arg = array_merge( $default, $arg );
 
@@ -162,7 +162,7 @@ class TermSynonyms {
         $synonyms_definition_id = wp_insert_post( $post );
         add_post_meta(
             $synonyms_definition_id,
-            TERM_SYNONYMS_TAXONOMY_FIELD_KEY,
+            CATEGORY_SYNONYMS_TAXONOMY_FIELD_KEY,
             $arg['taxonomy']
         );
         return array(
@@ -185,7 +185,7 @@ class TermSynonyms {
         // simply read synonyms by synonyms_id and return synonyms object.
         $taxonomy = get_post_meta(
             $synonyms_definition_id,
-            TERM_SYNONYMS_TAXONOMY_FIELD_KEY,
+            CATEGORY_SYNONYMS_TAXONOMY_FIELD_KEY,
             true
         );
 
@@ -202,7 +202,7 @@ class TermSynonyms {
 
         $default = array(
             'field'    => 'name',
-            'taxonomy' => TERM_SYNONYMS_DEFAULT_TAXONOMY
+            'taxonomy' => CATEGORY_SYNONYMS_DEFAULT_TAXONOMY
         );
         $arg = array_merge( $default, $arg );
 

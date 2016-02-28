@@ -1,16 +1,16 @@
 <?php
 
-class TermSynonymsTest extends WP_UnitTestCase {
+class CategorySynonymsTest extends WP_UnitTestCase {
 
-	private $termSynonyms;
+	private $categorySynonyms;
 	private $post_type;
 
 
 	function __construct()
 	{
-		global $termSynonyms_instance;
-		$this->termSynonyms = $termSynonyms_instance;
-		$this->post_type = $termSynonyms_instance->post_type;
+		global $categorySynonyms_instance;
+		$this->categorySynonyms = $categorySynonyms_instance;
+		$this->post_type = $categorySynonyms_instance->post_type;
 	}
 
 
@@ -29,7 +29,7 @@ class TermSynonymsTest extends WP_UnitTestCase {
 	function test_custom_post_type_registration()
 	{
 		// [appearance] it should be that the singleton instance exists.
-		$this->assertNotNull( $this->termSynonyms );
+		$this->assertNotNull( $this->categorySynonyms );
 
 		// [behavior] it should be that the custom post type have been registered.
 		$this->assertTrue( post_type_exists( $this->post_type ) );
@@ -50,7 +50,7 @@ class TermSynonymsTest extends WP_UnitTestCase {
 	function test_for_synonyms_registration_and_unregistration()
 	{
 		//provisioning
-		$ts = $this->termSynonyms;
+		$ts = $this->categorySynonyms;
 
 		$synonymous_terms = array( 'white', 'bianco', 'weiss', 'abyad', '白' );
 		$tax_name = 'category';
@@ -80,7 +80,7 @@ class TermSynonymsTest extends WP_UnitTestCase {
 		// [appearance] also the taxnomy name should be set as custom field.
 		$this->assertEquals($tax_name, get_post_meta(
 			$registration_info['synonyms_definition_id'],
-			TERM_SYNONYMS_TAXONOMY_FIELD_KEY,
+			CATEGORY_SYNONYMS_TAXONOMY_FIELD_KEY,
 			true
 		) );
 
@@ -135,7 +135,7 @@ class TermSynonymsTest extends WP_UnitTestCase {
 	function test_of_get_synonyms_definition_by_id()
 	{
 		//provisioning
-		$ts = $this->termSynonyms;
+		$ts = $this->categorySynonyms;
 		$synonymous_terms = array( 'wine', 'ワイン' );
 		$tax_name = 'category';
 
@@ -158,7 +158,7 @@ class TermSynonymsTest extends WP_UnitTestCase {
 	function test_of_get_synonymous_terms_by()
 	{
 		//provisioning
-		$ts = $this->termSynonyms;
+		$ts = $this->categorySynonyms;
 		$args = array(
 			array(
 				'taxonomy' => 'category',
@@ -181,7 +181,6 @@ class TermSynonymsTest extends WP_UnitTestCase {
 			'taxonomy' => 'category',
 		) );
 
-		var_dump($result['term_taxonomy_ids']);
 		$this->assertEquals( count( $result['term_taxonomy_ids'] ), 3 );
 		$this->assertEquals( $result['taxonomy'], 'category' );
 
@@ -197,7 +196,7 @@ class TermSynonymsTest extends WP_UnitTestCase {
 	// function test_get_posts_intercepted()
 	// {
 	// 	//provisioning
-	// 	$ts = $this->termSynonyms;
+	// 	$ts = $this->categorySynonyms;
 	// 	$synonyms = array(
 	// 		'category' => array( 'tea', 'chai' )
 	// 	);
