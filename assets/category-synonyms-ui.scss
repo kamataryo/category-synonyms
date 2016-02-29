@@ -1,0 +1,11 @@
+table.category-synonyms-ui{
+    td.column-title, th.column-title {
+        width: 25%;
+    }
+    ul.term-list {
+        margin: 0;
+        li {
+            display: inline;
+        }
+    }
+}

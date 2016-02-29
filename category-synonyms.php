@@ -12,18 +12,22 @@ Author URI: http://www.github.com/KamataRyo/
 
 //Load required files
 require_once dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+require_once dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'category-synonyms-ui.php';
 
-// instansiate the plugin classes
+
+// settings const and var for global instance
 global $categorySynonyms_instance;
 define( 'CATEGORY_SYNONYMS_POST_TYPE', 'synonyms_definition' );
 define( 'CATEGORY_SYNONYMS_TEXT_DOMAIN', 'category_synonyms' );
 define( 'CATEGORY_SYNONYMS_DEFAULT_TAXONOMY', 'category' );
-define( 'CATEGORY_SYNONYMS_TAXONOMY_FIELD_KEY', 'term_synonyms_primary_taxonomy_key' );
+define( 'CATEGORY_SYNONYMS_TAXONOMY_FIELD_KEY', 'category_synonyms_primary_taxonomy_key' );
 
-$categorySynonyms_instance = new TermSynonyms( CATEGORY_SYNONYMS_POST_TYPE );
+// instansiate the plugin classes
+$categorySynonyms_instance = new CategorySynonyms( CATEGORY_SYNONYMS_POST_TYPE );
 
 
-class TermSynonyms {
+
+class CategorySynonyms {
 
 
     public $post_type;
@@ -164,8 +168,8 @@ class TermSynonyms {
     }
 
 
-    public function get_synonymous_terms_by( $arg ) {
-
+    public function get_synonymous_terms_by( $arg )
+    {
         $default = array(
             'field'    => 'name',
             'taxonomy' => CATEGORY_SYNONYMS_DEFAULT_TAXONOMY
@@ -203,6 +207,31 @@ class TermSynonyms {
 
         }
         $result['term_taxonomy_ids'] = array_unique( $result['term_taxonomy_ids'], SORT_REGULAR );
+
+        return $result;
+    }
+
+
+    function get_all_definitions() {
+
+        $synonyms_definitions = get_posts( array(
+            'number_posts' => -1,
+            'post_type'    => $this->post_type,
+            'post_status'  => 'any',
+        ) );
+
+        $result = array();
+
+        foreach ( $synonyms_definitions as $def ) {
+
+            $synonyms = $this->get_synonyms_definition_by_id( $def->ID );
+            array_push( $result, array(
+                'synonyms_definition_id' => $def->ID,
+                'label'                  => $def->post_title,
+                'taxonomy'               => $synonyms['taxonomy'],
+                'terms'                  => $synonyms['term_taxonomy_ids']
+            ) );
+        }
 
         return $result;
     }
