@@ -36,7 +36,7 @@
 
     function describe_category_synonyms_options_ui() {
     	if ( !current_user_can( 'manage_options' ) )  {
-    		wp_die( __( 'You do not have sufficient permissions to access this page.', CATEGORY_SYNONYMS_TEXT_DOMAIN ) );
+    		wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
     	}
 
         global $categorySynonyms_instance;
@@ -46,11 +46,11 @@
         <div class="wrap">
             <h1>
                 <?php echo esc_html__( 'Synonyms definitions', CATEGORY_SYNONYMS_TEXT_DOMAIN );  ?>
-                <a href="***js to add and post new ***" class="page-title-action click2add"><?php echo esc_html__( 'Add New', CATEGORY_SYNONYMS_TEXT_DOMAIN ); ?></a>
+                <a href="***js to add and post new ***" class="page-title-action click2add"><?php echo esc_html__( 'Add New Synonyms', CATEGORY_SYNONYMS_TEXT_DOMAIN ); ?></a>
             </h1>
             <ul class="subsubsub">
                 <li class="all">
-                    <?php echo esc_html__( 'All', CATEGORY_SYNONYMS_TEXT_DOMAIN  ); ?>
+                    <?php echo esc_html__( 'All' ); ?>
                     <span class="count">
                         (<?php echo count( $all_defs ); ?>)
                     </span>
@@ -61,12 +61,12 @@
             <input type="hidden"></input>
             <div class="tablenav top">
                 <div class="alignleft actions">
-                    <label for="bulk-action-selector-top" class="screen-reader-text">一括操作を選択</label>
+                    <label for="bulk-action-selector-top" class="screen-reader-text"><?php echo esc_html__( 'Select bulk action' ); ?></label>
                     <select name="action" id="bulk-action-selector-top">
-                        <option value="-1">一括操作</option>
-                    	<option value="trash">ゴミ箱へ移動</option>
+                        <option value="-1"><?php echo esc_html__( 'Bulk Actions' ); ?></option>
+                    	<option value="trash"><?php echo esc_html__( 'Move to Trash' ); ?></option>
                     </select>
-                    <input type="submit" id="doaction" class="button action" value="適用">
+                    <input type="submit" id="doaction" class="button action" value="<?php echo esc_html__( 'Apply' ); ?>">
                 </div>
             </div>
 
@@ -75,11 +75,11 @@
                 <thead>
                     <tr>
                         <td id="cb" class="manage-column column-cb check-column">
-                            <label class="screen-reader-text" for="cb-select-all-1">すべて選択</label>
+                            <label class="screen-reader-text" for="cb-select-all-1"><?php echo esc_html__( 'Select all' ); ?></label>
                             <input id="cb-select-all-1" type="checkbox">
                         </td>
-                        <th scope="col" class="manage-column column-title column-primary"><?php echo esc_html__('label', CATEGORY_SYNONYMS_TEXT_DOMAIN); ?></th>
-                        <th scope="col" class="manage-column column-categories"><?php echo esc_html__('taxonomy', CATEGORY_SYNONYMS_TEXT_DOMAIN); ?></th>
+                        <th scope="col" class="manage-column column-title column-primary"><?php echo esc_html__('labels', CATEGORY_SYNONYMS_TEXT_DOMAIN); ?></th>
+                        <th scope="col" class="manage-column column-categories"><?php echo esc_html__( 'taxonomies', CATEGORY_SYNONYMS_TEXT_DOMAIN); ?></th>
                         <th scope="col" class="manage-column column-terms"><?php echo esc_html__('terms', CATEGORY_SYNONYMS_TEXT_DOMAIN); ?></th>
                     </tr>
                 </thead>
@@ -87,10 +87,9 @@
 
                     <?php foreach ( $all_defs as $def ): ?>
                     <?php #tr要素はテンプレートパーツ化する。ここでの出力と、ajaxでクライアント側に返すために用いる ?>
-                    <tr id="synonyms-<?php echo esc_html( $def['synonyms_definition_id'] ); ?>"
-                        class="iedit">
+                    <tr id="synonyms-<?php echo esc_html( $def['synonyms_definition_id'] ); ?>">
                         <th scope="row" class="check-column">
-                            <label class="screen-reader-text" for="cb-select-<?php echo esc_html( $def['synonyms_definition_id'] ); ?>"><?php echo esc_html($def['label']); ?>を選択</label>
+                            <label class="screen-reader-text" for="cb-select-<?php echo esc_html( $def['synonyms_definition_id'] ); ?>"><?php printf( esc_html__('Select %s'), $def['label'] ); ?></label>
 			                <input id="cb-select-<?php echo esc_html( $def['synonyms_definition_id'] ); ?>" type="checkbox" name="synonyms_def[]" value="<?php echo esc_html( $def['synonyms_definition_id'] ); ?>">
 			                <div class="locked-indicator"></div>
 		                </th>
@@ -98,7 +97,7 @@
                             <strong>
                                 <?php echo esc_html( $def['label'] ); ?>
                             </strong>
-                            <button type="button" class="toggle-row"><span class="screen-reader-text">詳細を追加表示</span></button>
+                            <button type="button" class="toggle-row"><span class="screen-reader-text"><?php echo esc_html__( 'Show more details' ); ?></span></button>
                         </td>
                         <td class="column-categories" data-colname="<?php echo esc_html__('taxonomy', CATEGORY_SYNONYMS_TEXT_DOMAIN); ?>">
                             <span class="click2input"><?php echo esc_html( $def['taxonomy'] ); ?></span>
@@ -125,12 +124,12 @@
 
             <div class="tablenav bottom">
     			<div class="alignleft actions">
-        			<label for="bulk-action-selector-bottom" class="screen-reader-text">一括操作を選択</label>
+        			<label for="bulk-action-selector-bottom" class="screen-reader-text"><?php echo esc_html__( 'Select bulk action' ); ?></label>
                     <select name="action2" id="bulk-action-selector-bottom">
-                        <option value="-1">一括操作</option>
-        	            <option value="trash">ゴミ箱へ移動</option>
+                        <option value="-1"><?php echo esc_html__( 'Bulk Actions' ); ?></option>
+        	            <option value="trash"><?php echo esc_html__( 'Move to Trash' ); ?></option>
                     </select>
-                    <input type="submit" id="doaction2" class="button action" value="適用">
+                    <input type="submit" id="doaction2" class="button action" value="<?php echo esc_html__( 'Apply' ); ?>">
     		    </div>
 		    </div>
 
