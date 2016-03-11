@@ -6,6 +6,27 @@ table.category-synonyms-ui{
         margin: 0;
         li {
             display: inline;
+            &+li:before {
+                content: ', ';
+            }
         }
     }
+    .click2input, .click2inputs {
+        font-weight: bold;
+        &:hover {
+            cursor: pointer;
+        }
+    }
+
+
+    .clicked2input, .clicked2inputs {
+        display: none;
+        padding: 0;
+        font-size: inherit;
+        width: 100%;
+        @media screen and (max-width: 782px) {
+            margin-right: 40px;
+        }
+    }
+
 }

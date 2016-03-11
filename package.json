@@ -3,11 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "directories": {
-    "test": "tests"
-  },
   "scripts": {
-    "test": ""
+    "test": "",
+    "build": "gulp build"
   },
   "repository": {
     "type": "git",

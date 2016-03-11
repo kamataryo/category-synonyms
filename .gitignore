@@ -1,5 +1,6 @@
 /assets/*.css
-/assets/*.css.map
+/assets/*.js
+/assets/*.map
 .sass-cache/
 node_modules/
 /vendor/
