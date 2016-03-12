@@ -142,3 +142,9 @@
 
         <?php
     }
+
+
+    // set up template-tags
+    function get_the_term_list_synonymously() {
+        
+    }

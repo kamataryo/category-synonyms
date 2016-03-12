@@ -226,5 +226,59 @@ class CategorySynonymsTest extends WP_UnitTestCase {
 				$this->assertInternalType( 'integer', $term );
 			}
 		}
+
+		//clean up
+		foreach ( $infos as $info ) {
+			$ts->unregister( $info['synonyms_definition_id'] );
+		}
+	}
+
+
+	function test_of_extend_template_tags() {
+		// function(custom tempalate tag) to test
+		$this->assertTrue( function_exists( 'get_the_term_list_synonymously' ) );
+
+
+		//provisioning
+		$ts = $this->categorySynonyms;
+		$args = array(
+			array(
+				'taxonomy' => 'category',
+				'terms'    => array( 'mocha', 'coffee' ),
+			),
+			array(
+				'taxonomy' => 'category',
+				'terms' => array( 'coffee', 'qafa' ),
+			),
+		);
+		$infos = array();
+		foreach ( $args as $arg ) {
+			array_push( $infos, $ts->register( $arg ) );
+		}
+		$test_post_id = wp_insert_post( array(
+			'post_content' => 'test post content',
+			'post_type'   => 'post',
+			'post_category' => array( get_term_by( 'name', 'mocha', 'category' )->term_id )
+		) );
+
+		$the_terms = array( 'mocha', 'coffee', 'qafa' );
+		$expected_flagments = array();
+		foreach ( $the_terms as $the_term ) {
+			array_push( $expected_flagments, '<a href="' . get_term_link( $the_term, 'category'  ) . '">' . $the_term . '</a>' );
+		}
+		$before = '<h1>this is before</h1>';
+		$sep = 'separator';
+		$after = '<small>this is after</small>';
+		$expectation = $before . implode( $sep, $expected_flagments ) . $after;
+		$actual = get_the_term_list_synonymously( $test_post_id, 'category', $before, $sep, $after );
+
+
+		$this->assertEquals( $expectation, $actual );
+
+		//clean up
+		foreach ( $infos as $info ) {
+			$ts->unregister( $info['synonyms_definition_id'] );
+		}
+
 	}
 }
