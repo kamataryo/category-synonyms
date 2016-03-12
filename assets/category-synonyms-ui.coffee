@@ -32,6 +32,7 @@ jQuery ($)->
             .show()
 
     $('.click2add.page-title-action').on 'click', ->
+        alert ajax.Endpoints
         #ここでajaxでsynonym-definitionを作成。
         #戻ってきた要素を入れる
         $('table.category-synonyms-ui>tbody.the-list').append trAJAXed

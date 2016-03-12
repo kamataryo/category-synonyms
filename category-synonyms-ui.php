@@ -2,16 +2,17 @@
 
     // set up UI
 
-    add_action( 'admin_init', 'category_synonyms_admin_init' );
-    function category_synonyms_admin_init() {
+    function category_synonyms_admin_init()
+    {
           // register style sheet
           wp_register_style( 'categorySynonymsStylesheet', plugins_url( 'assets/category-synonyms-ui.css', __FILE__ ) );
           wp_register_script( 'categorySynonymsScript', plugins_url( 'assets/category-synonyms-ui.js', __FILE__ ), array( 'jquery' ) );
-      }
+    }
+    add_action( 'admin_init', 'category_synonyms_admin_init' );
 
 
-    add_action( 'admin_menu', 'category_synonyms_admin_menu' );
-    function category_synonyms_admin_menu() {
+    function category_synonyms_admin_menu()
+    {
     	$page = add_options_page(
             __( 'synonyms registration', CATEGORY_SYNONYMS_TEXT_DOMAIN ),
             __( 'Category Synonyms', CATEGORY_SYNONYMS_TEXT_DOMAIN ),
@@ -22,19 +23,26 @@
         add_action( 'admin_print_styles-' . $page, 'category_synonyms_admin_styles' );
         add_action( 'admin_print_scripts-' . $page , 'category_synonyms_admin_scripts' );
     }
+    add_action( 'admin_menu', 'category_synonyms_admin_menu' );
 
 
-    function category_synonyms_admin_styles() {
+    function category_synonyms_admin_styles()
+    {
         wp_enqueue_style( 'categorySynonymsStylesheet' );
     }
 
-    function category_synonyms_admin_scripts() {
+    function category_synonyms_admin_scripts()
+    {
         wp_enqueue_script( 'jquery' );
         wp_enqueue_script( 'categorySynonymsScript' );
+        wp_localize_script( 'categorySynonymsScript','ajax' , array(
+            'Endpoints' => admin_url( 'admin-ajax.php' ),
+        ) );
     }
 
 
-    function describe_category_synonyms_options_ui() {
+    function describe_category_synonyms_options_ui()
+    {
     	if ( !current_user_can( 'manage_options' ) )  {
     		wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
     	}
@@ -46,7 +54,7 @@
         <div class="wrap">
             <h1>
                 <?php echo esc_html__( 'Synonyms definitions', CATEGORY_SYNONYMS_TEXT_DOMAIN );  ?>
-                <a href="***js to add and post new ***" class="page-title-action click2add"><?php echo esc_html__( 'Add New Synonyms', CATEGORY_SYNONYMS_TEXT_DOMAIN ); ?></a>
+                <a href="#" class="page-title-action click2add"><?php echo esc_html__( 'Add New Synonyms', CATEGORY_SYNONYMS_TEXT_DOMAIN ); ?></a>
             </h1>
             <ul class="subsubsub">
                 <li class="all">

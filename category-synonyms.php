@@ -26,7 +26,6 @@ define( 'CATEGORY_SYNONYMS_TAXONOMY_FIELD_KEY', 'category_synonyms_primary_taxon
 $categorySynonyms_instance = new CategorySynonyms( CATEGORY_SYNONYMS_POST_TYPE );
 
 
-
 class CategorySynonyms {
 
 
@@ -34,6 +33,7 @@ class CategorySynonyms {
 
     function __construct( $post_type )
     {
+        // a custom post type is defined as management object for synonyms.
         $this->post_type = $post_type;
         add_action( 'init', array( &$this, 'manager_post_type_init' ) );
     }
