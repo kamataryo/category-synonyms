@@ -237,6 +237,7 @@ class CategorySynonymsTest extends WP_UnitTestCase {
 	function test_of_extend_template_tags() {
 		// function(custom tempalate tag) to test
 		$this->assertTrue( function_exists( 'get_the_term_list_synonymously' ) );
+		$this->assertTrue( function_exists( 'get_term_link_synonymously' ) );
 
 
 		//provisioning
@@ -272,9 +273,15 @@ class CategorySynonymsTest extends WP_UnitTestCase {
 		$after = '<small>this is after</small>';
 		$expectation = $before . implode( $sep, $expected_flagments ) . $after;
 		$actual = get_the_term_list_synonymously( $test_post_id, 'category', $before, $sep, $after );
-
-
+		//assert
 		$this->assertEquals( $expectation, $actual );
+
+		//calculate expetation 2
+		$expected = get_home_url() . '/category/qafa,mocha,coffee' ;
+		$actual = get_term_link_synonymously( 'qafa', 'category' );
+		//assert
+		$this->assertEquals( $expected, $actual );
+
 
 		//clean up
 		foreach ( $infos as $info ) {

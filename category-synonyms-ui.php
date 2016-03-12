@@ -153,7 +153,9 @@
 
 
     // set up template-tags
-    function get_the_term_list_synonymously( $id, $taxonomy, $before, $sep, $after ) {
+
+    function get_the_term_list_synonymously( $id, $taxonomy, $before, $sep, $after )
+    {
         global $categorySynonyms_instance;
         $terms = get_the_terms( $id, $taxonomy );
         $ids_result = array();
@@ -171,4 +173,24 @@
 
         sort( $ids_result );
         return $before . implode( $sep, $ids_result ) . $after;
+    }
+
+    function get_term_link_synonymously( $name, $taxonomy )
+    {
+        global $categorySynonyms_instance;
+        $term_ids = $categorySynonyms_instance->get_synonymous_terms_by( array(
+            'field'    => 'name',
+            'value'    => $name,
+            'taxonomy' => $taxonomy
+        ) )['term_taxonomy_ids'];
+
+        $terms = array( $name );
+        foreach ( $term_ids as $term_id ) {
+            $value = get_term_by( 'id', $term_id, $taxonomy )->name;
+            if ($value !== $name) {
+                array_push( $terms, $value );
+            }
+        }
+
+        return get_home_url() . '/' . $taxonomy . '/' . implode(',', $terms);
     }
