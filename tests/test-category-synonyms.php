@@ -248,19 +248,20 @@ class CategorySynonymsTest extends WP_UnitTestCase {
 			),
 			array(
 				'taxonomy' => 'category',
-				'terms' => array( 'coffee', 'qafa' ),
+				'terms' => array( 'coffee', 'qafa', 'mocha' ),
 			),
 		);
 		$infos = array();
 		foreach ( $args as $arg ) {
 			array_push( $infos, $ts->register( $arg ) );
 		}
+		//// create dummy post
 		$test_post_id = wp_insert_post( array(
 			'post_content' => 'test post content',
 			'post_type'   => 'post',
-			'post_category' => array( get_term_by( 'name', 'mocha', 'category' )->term_id )
+			'post_category' => array( get_term_by( 'name', 'coffee', 'category' )->term_id )
 		) );
-
+		// calculate expectation
 		$the_terms = array( 'mocha', 'coffee', 'qafa' );
 		$expected_flagments = array();
 		foreach ( $the_terms as $the_term ) {

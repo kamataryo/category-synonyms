@@ -145,6 +145,22 @@
 
 
     // set up template-tags
-    function get_the_term_list_synonymously() {
-        
+    function get_the_term_list_synonymously( $id, $taxonomy, $before, $sep, $after ) {
+        global $categorySynonyms_instance;
+        $terms = get_the_terms( $id, $taxonomy );
+        $ids_result = array();
+
+        foreach ( $terms as $term ) {
+            $ids =  $categorySynonyms_instance->get_synonymous_terms_by( array(
+                'field'    => 'id',
+                'value'    => $term->term_id,
+                'taxonomy' => $taxonomy
+            ) )['term_taxonomy_ids'];
+            foreach ( $ids as $id ) {
+                array_push( $ids_result, '<a href="' . get_term_link( $id, $taxonomy  ) . '">' .get_term_by( 'id', $id, $taxonomy )->name . '</a>' );
+            }
+        }
+
+        sort( $ids_result );
+        return $before . implode( $sep, $ids_result ) . $after;
     }
