@@ -165,7 +165,11 @@
                 <span class="click2input"><?php echo esc_html( $def['taxonomy'] ); ?></span>
                 <select name="clicked2input-taxonomy"  class="clicked2input"  value="<?php echo esc_html( $def['taxonomy'] ); ?>" data-updatable="taxonomy">
                 <?php foreach ( get_taxonomies() as $taxonomy ): ?>
-                    <option value="<?php echo esc_html( $taxonomy ); ?>"><?php echo esc_html( $taxonomy ); ?></option>
+                    <?php if ($taxonomy === 'nav_menu' || $taxonomy === 'post_format' || $taxonomy ==='link_category' ): ?>
+                        <?php continue; ?>
+                    <?php endif; ?>
+                    <?php $selected = $def['taxonomy'] === $taxonomy ? ' selected="selected"' : ''; ?>
+                    <option value="<?php echo esc_html( $taxonomy ); ?>"<?php echo $selected; ?>><?php echo esc_html( $taxonomy ); ?></option>
                 <?php endforeach;  ?>
                 </select>
             </td>

@@ -33,7 +33,7 @@ msgstr "同義語の定義"
 
 #: category-synonyms-ui.php:99
 msgid "Add New Synonyms"
-msgstr "新しい同義語を追加する"
+msgstr "新しい同義語群を追加する"
 
 #: category-synonyms-ui.php:105
 msgid "Select bulk action"
