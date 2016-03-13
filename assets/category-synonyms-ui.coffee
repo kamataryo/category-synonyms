@@ -39,6 +39,11 @@ jQuery ($)->
                     .filter((v)->return v isnt '')
                 updates = {}
                 updates[$(this).data 'updatable'] = terms
+                console.log {
+                    action: 'category_synonyms_update_def'
+                    id
+                    updates
+                }
                 $.post ajax.Endpoints, {
                     action: 'category_synonyms_update_def'
                     id

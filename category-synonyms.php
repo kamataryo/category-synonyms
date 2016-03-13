@@ -18,7 +18,7 @@ require_once dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'category-synonyms-ui.p
 // settings const and var for global instance
 global $categorySynonyms_instance;
 define( 'CATEGORY_SYNONYMS_POST_TYPE', 'synonyms_definition' );
-define( 'CATEGORY_SYNONYMS_TEXT_DOMAIN', 'category_synonyms' );
+define( 'CATEGORY_SYNONYMS_TEXT_DOMAIN', 'category-synonyms' );
 define( 'CATEGORY_SYNONYMS_DEFAULT_TAXONOMY', 'category' );
 define( 'CATEGORY_SYNONYMS_TAXONOMY_FIELD_KEY', 'category_synonyms_primary_taxonomy_key' );
 
@@ -35,6 +35,7 @@ class CategorySynonyms {
     {
         // a custom post type is defined as management object for synonyms.
         $this->post_type = $post_type;
+        add_action( 'init', array( &$this, 'load_textdomain' ) );
         add_action( 'init', array( &$this, 'manager_post_type_init' ) );
     }
 
@@ -81,6 +82,16 @@ class CategorySynonyms {
         }
     }
 
+    public function load_textdomain()
+    {
+        load_plugin_textdomain(
+            CATEGORY_SYNONYMS_TEXT_DOMAIN,
+            false,
+            dirname( plugin_basename( __FILE__ ) ) . '/languages/'
+        );
+    }
+
+
     public function register( $arg )
     {
         if (! array_key_exists( 'terms' , $arg ) ) {
@@ -90,7 +101,7 @@ class CategorySynonyms {
         }
 
         $default = array(
-            'label' => __( 'no synonyms definition label', CATEGORY_SYNONYMS_TEXT_DOMAIN ),
+            'label' => __( '(synonyms definition label)', CATEGORY_SYNONYMS_TEXT_DOMAIN ),
             'taxonomy' => CATEGORY_SYNONYMS_DEFAULT_TAXONOMY,
         );
         $arg = array_merge( $default, $arg );

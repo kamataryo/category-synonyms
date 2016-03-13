@@ -1,0 +1,165 @@
+# Copyright (C) 2016 Category Synonyms
+# This file is distributed under the same license as the Category Synonyms package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Category Synonyms 0.0.1\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/category-"
+"synonyms\n"
+"POT-Creation-Date: 2016-03-13 05:45:18+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2016-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+
+#: category-synonyms-ui.php:17
+msgid "synonyms registration"
+msgstr "同義語の登録"
+
+#. #-#-#-#-#  category-synonyms.pot (Category Synonyms 0.0.1)  #-#-#-#-#
+#. Plugin Name of the plugin/theme
+#: category-synonyms-ui.php:18
+msgid "Category Synonyms"
+msgstr ""
+
+#: category-synonyms-ui.php:89
+msgid "You do not have sufficient permissions to access this page."
+msgstr "このページにアクセスする権限がありません。"
+
+#: category-synonyms-ui.php:98
+msgid "Synonyms definitions"
+msgstr "同義語の定義"
+
+#: category-synonyms-ui.php:99
+msgid "Add New Synonyms"
+msgstr "新しい同義語を追加する"
+
+#: category-synonyms-ui.php:105
+msgid "Select bulk action"
+msgstr "一括操作を選択"
+
+#: category-synonyms-ui.php:107
+msgid "Bulk Actions"
+msgstr "一括操作"
+
+#: category-synonyms-ui.php:108
+msgid "Delete"
+msgstr "削除"
+
+#: category-synonyms-ui.php:110
+msgid "Apply"
+msgstr "適用"
+
+#: category-synonyms-ui.php:119
+msgid "Select all"
+msgstr "全てを選択"
+
+#: category-synonyms-ui.php:122
+msgid "labels"
+msgstr "ラベル"
+
+#: category-synonyms-ui.php:123
+msgid "taxonomies"
+msgstr "タクソノミー"
+
+#: category-synonyms-ui.php:124 category-synonyms-ui.php:173
+msgid "terms"
+msgstr "ターム"
+
+#: category-synonyms-ui.php:138
+msgid "No Synonyms has been defined.."
+msgstr "同義語は定義されていません。"
+
+#: category-synonyms-ui.php:153
+msgid "Select %s"
+msgstr "%sを選択"
+
+#: category-synonyms-ui.php:161
+msgid "Show more details"
+msgstr "詳細を表示"
+
+#: category-synonyms-ui.php:164
+msgid "taxonomy"
+msgstr "タクソノミー"
+
+#: category-synonyms.php:45
+msgctxt "post type general name"
+msgid "Synonyms"
+msgstr "同義語"
+
+#: category-synonyms.php:46
+msgctxt "post type singular name"
+msgid "Synonym"
+msgstr "同義語"
+
+#: category-synonyms.php:47
+msgctxt "admin menu"
+msgid "Synonyms"
+msgstr "同義語"
+
+#: category-synonyms.php:48
+msgctxt "add new on admin bar"
+msgid "Synonym"
+msgstr "同義語"
+
+#: category-synonyms.php:49
+msgctxt "Synonym"
+msgid "Add New"
+msgstr "新規追加"
+
+#: category-synonyms.php:50
+msgid "Add New Synonym"
+msgstr "新しい同義語を追加"
+
+#: category-synonyms.php:51
+msgid "New Synonym"
+msgstr "新しい同義語"
+
+#: category-synonyms.php:52
+msgid "Edit Synonym"
+msgstr "同義語を編集"
+
+#: category-synonyms.php:53
+msgid "View Synonym"
+msgstr "同義語を見る"
+
+#: category-synonyms.php:54
+msgid "All Synonyms"
+msgstr "全ての同義語"
+
+#: category-synonyms.php:55
+msgid "Search Synonyms"
+msgstr "同義語を検索"
+
+#: category-synonyms.php:56
+msgid "Parent Synonyms:"
+msgstr "上位の同義語"
+
+#: category-synonyms.php:57
+msgid "No synonyms found."
+msgstr "同義語が見つかりません。"
+
+#: category-synonyms.php:58
+msgid "No synonyms found in Trash."
+msgstr "同義語がゴミ箱にありません。"
+
+#: category-synonyms.php:93
+msgid "(synonyms definition label)"
+msgstr "（同義語定義ラベル）"
+
+#. Plugin URI of the plugin/theme
+msgid "http://www.github.com/KamataRyo/category-synonyms"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid "define synonymous relationships among terms."
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "kamataryo"
+msgstr "鎌田遼"
+
+#. Author URI of the plugin/theme
+msgid "http://www.github.com/KamataRyo/"
+msgstr ""

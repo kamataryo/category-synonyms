@@ -46,7 +46,6 @@
         global $categorySynonyms_instance;
         $cs = $categorySynonyms_instance;
         $def_id = $cs->register( array(
-            'label' => 'new',
             'terms' => array(),
             'taxonomy' => 'category'
         ) )['synonyms_definition_id'];
