@@ -50,13 +50,13 @@ class CategorySynonymsTest extends WP_UnitTestCase {
 	function test_for_synonyms_registration_and_unregistration()
 	{
 		//provisioning
-		$ts = $this->categorySynonyms;
+		$cs = $this->categorySynonyms;
 
 		$synonymous_terms = array( 'white', 'bianco', 'weiss', 'abyad', '白' );
 		$tax_name = 'category';
 
 		// `synonyms_id` is `post_id`
-		$registration_info = $ts->register( array(
+		$registration_info = $cs->register( array(
 			'label'    => 'synonym label in test to identifiy the synonym group',
 			'terms'    => $synonymous_terms,
 			'taxonomy' => $tax_name,
@@ -122,7 +122,7 @@ class CategorySynonymsTest extends WP_UnitTestCase {
 
 
 		// describe unregister test
-		$unregistration_info = $ts->unregister( $registration_info['synonyms_definition_id'] );
+		$unregistration_info = $cs->unregister( $registration_info['synonyms_definition_id'] );
 
 		// [appearance] it should be that the function returns copied deleted post object.
 		$this->assertNotFalse( $unregistration_info );
@@ -133,33 +133,72 @@ class CategorySynonymsTest extends WP_UnitTestCase {
 	}
 
 
+	function test_for_synonym_definition_update()
+	{
+		//provisioning
+		$cs = $this->categorySynonyms;
+
+		$synonymous_terms = array( 'white', 'bianco', 'weiss' );
+		$tax_name = 'category';
+
+		// `synonyms_id` is `post_id`
+		$info_before = $cs->register( array(
+			'label'    => 'synonym label in test to identifiy the synonym group',
+			'terms'    => $synonymous_terms,
+			'taxonomy' => $tax_name,
+		) );
+
+		$info_after = $cs->update( $info_before['synonyms_definition_id'], array(
+			'label' => 'label updated.',
+			'terms' => array( 'white', 'abyad', 'weiss' ),
+			'taxonomy' => 'post_tag'
+		) );
+
+		$actual = array();
+		$def = $cs->get_defined_synonyms_by_id( $info_before['synonyms_definition_id'] );
+
+		$actual['terms'] = array();
+		foreach ( $def['term_taxonomy_ids'] as $tt_id ) {
+			array_push( $actual['terms'], get_term_by( 'id', $tt_id, $def['taxonomy'] )->name );
+		}
+		;
+		$actual['taxonomy'] = $def['taxonomy'];
+		$actual['label'] = get_the_title( $info_before['synonyms_definition_id'] );
+
+		$this->assertEquals( 'label updated.', $actual['label'] );
+		$this->assertEquals( 'post_tag', $actual['taxonomy'] );
+		$this->assertEquals( array( 'white', 'abyad', 'weiss' ), $actual['terms'] );
+	}
+
+
+
 	function test_of_get_defined_synonyms_by_id()
 	{
 		//provisioning
-		$ts = $this->categorySynonyms;
+		$cs = $this->categorySynonyms;
 		$synonymous_terms = array( 'wine', 'ワイン' );
 		$tax_name = 'category';
 
-		$registration_info = $ts->register( array(
+		$registration_info = $cs->register( array(
 			'label' => 'synonym label in test to read the synonym group',
 			'taxonomy' => $tax_name,
 			'terms' => $synonymous_terms,
 		) );
 
-		$result = $ts->get_defined_synonyms_by_id( $registration_info['synonyms_definition_id'] );
+		$result = $cs->get_defined_synonyms_by_id( $registration_info['synonyms_definition_id'] );
 
 		$this->assertEquals( count( $result['term_taxonomy_ids'] ), count( $synonymous_terms ) );
 		$this->assertEquals( $result['taxonomy'], $tax_name );
 
 		// clean up for next test.
-		$ts->unregister( $registration_info['synonyms_definition_id'] );
+		$cs->unregister( $registration_info['synonyms_definition_id'] );
 	}
 
 
 	function test_of_get_synonymous_terms_by()
 	{
 		//provisioning
-		$ts = $this->categorySynonyms;
+		$cs = $this->categorySynonyms;
 		$args = array(
 			array(
 				'taxonomy' => 'category',
@@ -172,10 +211,10 @@ class CategorySynonymsTest extends WP_UnitTestCase {
 		);
 		$infos = array();
 		foreach ( $args as $arg ) {
-			array_push( $infos, $ts->register( $arg ) );
+			array_push( $infos, $cs->register( $arg ) );
 		}
 
-		$result = $ts->get_synonymous_terms_by( array(
+		$result = $cs->get_synonymous_terms_by( array(
 			'field'    => 'name',
 			'value'    => 'coffee',
 			'taxonomy' => 'category',
@@ -188,7 +227,7 @@ class CategorySynonymsTest extends WP_UnitTestCase {
 
 		//clean up
 		foreach ( $infos as $info ) {
-			$ts->unregister( $info['synonyms_definition_id'] );
+			$cs->unregister( $info['synonyms_definition_id'] );
 		}
 	}
 
@@ -196,7 +235,7 @@ class CategorySynonymsTest extends WP_UnitTestCase {
 	function test_of_get_all_definitions() {
 
 		//provisioning
-		$ts = $this->categorySynonyms;
+		$cs = $this->categorySynonyms;
 		$args = array(
 			array(
 				'taxonomy' => 'category',
@@ -209,7 +248,7 @@ class CategorySynonymsTest extends WP_UnitTestCase {
 		);
 		$infos = array();
 		foreach ( $args as $arg ) {
-			array_push( $infos, $ts->register( $arg ) );
+			array_push( $infos, $cs->register( $arg ) );
 		}
 
 
@@ -229,7 +268,7 @@ class CategorySynonymsTest extends WP_UnitTestCase {
 
 		//clean up
 		foreach ( $infos as $info ) {
-			$ts->unregister( $info['synonyms_definition_id'] );
+			$cs->unregister( $info['synonyms_definition_id'] );
 		}
 	}
 
@@ -241,7 +280,7 @@ class CategorySynonymsTest extends WP_UnitTestCase {
 
 
 		//provisioning
-		$ts = $this->categorySynonyms;
+		$cs = $this->categorySynonyms;
 		$args = array(
 			array(
 				'taxonomy' => 'category',
@@ -254,7 +293,7 @@ class CategorySynonymsTest extends WP_UnitTestCase {
 		);
 		$infos = array();
 		foreach ( $args as $arg ) {
-			array_push( $infos, $ts->register( $arg ) );
+			array_push( $infos, $cs->register( $arg ) );
 		}
 		//// create dummy post
 		$test_post_id = wp_insert_post( array(
@@ -285,7 +324,7 @@ class CategorySynonymsTest extends WP_UnitTestCase {
 
 		//clean up
 		foreach ( $infos as $info ) {
-			$ts->unregister( $info['synonyms_definition_id'] );
+			$cs->unregister( $info['synonyms_definition_id'] );
 		}
 
 	}

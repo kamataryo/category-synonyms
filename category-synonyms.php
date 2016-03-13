@@ -150,6 +150,63 @@ class CategorySynonyms {
     }
 
 
+    public function update( $synonyms_definition_id, $arg )
+    {
+        $post = array(
+            'ID' => $synonyms_definition_id,
+            'post_type' => $this->post_type,
+        );
+
+        if ( isset($arg['label']) ) {
+            $post['post_title'] = $arg['label'];
+        }
+        if ( ! isset( $arg['taxonomy'] ) ) {
+            $arg['taxonomy'] = get_post_meta(
+                $synonyms_definition_id,
+                CATEGORY_SYNONYMS_TAXONOMY_FIELD_KEY,
+                true
+            );
+        }
+
+        //register terms
+        $term_taxonomy_ids = array();
+        foreach ( $arg['terms'] as $term ) {
+
+            $exists = term_exists( $term, $arg['taxonomy'] );
+            array_push(
+                $term_taxonomy_ids,
+                $exists ? $exists : wp_insert_term( $term, $arg['taxonomy'] )
+            );
+
+        }
+
+        $ttids_filtered = Ginq::from( $term_taxonomy_ids )
+            ->select( function( $tt ){return $tt['term_taxonomy_id'] ;} )
+            ->toList()
+        ;
+
+        if ( $arg['taxonomy'] === 'category' ) {
+            $post['post_category'] = $ttids_filtered;
+        } else if ( $arg['taxonomy'] === 'post_tag' ) {
+            $post['tags_input'] = $ttids_filtered;
+        } else {
+            $post['tax_input'] = array( $arg['taxonomy'] => $ttids_filtered );
+        }
+
+        wp_update_post( $post );
+        update_post_meta(
+            $synonyms_definition_id,
+            CATEGORY_SYNONYMS_TAXONOMY_FIELD_KEY,
+            $arg['taxonomy']
+        );
+        return array(
+            'synonyms_definition_id' => $synonyms_definition_id, //post_id or Error
+            'taxonomy' => $arg['taxonomy'],
+            'term_taxonomy_ids' => $term_taxonomy_ids,
+        );
+    }
+
+
     public function get_defined_synonyms_by_id( $synonyms_definition_id )
     {
         // simply read synonyms by synonyms_id and return synonyms object.
