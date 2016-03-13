@@ -74,6 +74,16 @@
     add_action( 'wp_ajax_category_syonyms_delete_defs', 'ajax_delete_defs' );
 
 
+    function ajax_update_def()
+    {
+        global $categorySynonyms_instance;
+        $cs = $categorySynonyms_instance;
+        $cs->update( $_POST['id'], $_POST['updates'] );
+        wp_send_json_success();
+    }
+    add_action( 'wp_ajax_category_synonyms_update_def', 'ajax_update_def' );
+
+
     function describe_category_synonyms_options_ui()
     {
     	if ( !current_user_can( 'manage_options' ) )  {
@@ -139,22 +149,28 @@
     function admin_synonym_def_tr( $def )
     {
     ?>
-        <tr id="synonyms-<?php echo esc_html( $def['synonyms_definition_id'] ); ?>">
+        <tr id="synonyms-<?php echo esc_html( $def['synonyms_definition_id'] ); ?>" data-id="<?php echo esc_html( $def['synonyms_definition_id'] ); ?>">
             <th scope="row" class="check-column">
                 <label class="screen-reader-text" for="cb-select-<?php echo esc_html( $def['synonyms_definition_id'] ); ?>"><?php printf( esc_html__('Select %s'), $def['label'] ); ?></label>
                 <input id="cb-select-<?php echo esc_html( $def['synonyms_definition_id'] ); ?>" type="checkbox" name="synonyms_def[]" value="<?php echo esc_html( $def['synonyms_definition_id'] ); ?>">
                 <div class="locked-indicator"></div>
             </th>
+
             <td class="column-title title column-title has-row-actions column-primary page-title">
-                <strong>
-                    <?php echo esc_html( $def['label'] ); ?>
-                </strong>
+                <span class="click2input"><?php echo esc_html( $def['label'] ); ?></span>
+                <input type="text" name="clicked2input-label" class="clicked2input" value="<?php echo esc_html( $def['label'] ); ?>" data-updatable="label">
                 <button type="button" class="toggle-row"><span class="screen-reader-text"><?php echo esc_html__( 'Show more details' ); ?></span></button>
             </td>
+
             <td class="column-categories" data-colname="<?php echo esc_html__('taxonomy', CATEGORY_SYNONYMS_TEXT_DOMAIN); ?>">
                 <span class="click2input"><?php echo esc_html( $def['taxonomy'] ); ?></span>
-                <input type="text" name="clicked2input-taxonomy" class="clicked2input" value="<?php echo esc_html( $def['taxonomy'] ); ?>">
+                <select name="clicked2input-taxonomy"  class="clicked2input"  value="<?php echo esc_html( $def['taxonomy'] ); ?>" data-updatable="taxonomy">
+                <?php foreach ( get_taxonomies() as $taxonomy ): ?>
+                    <option value="<?php echo esc_html( $taxonomy ); ?>"><?php echo esc_html( $taxonomy ); ?></option>
+                <?php endforeach;  ?>
+                </select>
             </td>
+
             <td class="column-terms" data-colname="<?php echo esc_html__('terms', CATEGORY_SYNONYMS_TEXT_DOMAIN); ?>">
                 <ul class="term-list click2inputs">
                 <?php $terms = array();  ?>
@@ -170,7 +186,7 @@
                     <?php endforeach; ?>
                 <?php endif; ?>
                 </ul>
-                <input type="text" name="clicked2input-terms" class="clicked2inputs" value="<?php echo esc_html( implode( ',', $terms ) ); ?>">
+                <input type="text" name="clicked2input-terms" class="clicked2inputs" value="<?php echo esc_html( implode( ',', $terms ) ); ?>" data-updatable="terms">
             </td>
         </tr>
     <?php

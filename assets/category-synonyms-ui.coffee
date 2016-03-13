@@ -1,6 +1,7 @@
 # click to make input
 jQuery ($)->
     # utilities
+    ## event definition for each element
     refreshEvents = ->
         $('.click2input, .click2inputs')
             .off 'click'
@@ -15,6 +16,14 @@ jQuery ($)->
         $('.clicked2input')
             .off 'focusout'
             .on 'focusout', ->
+                id = $(this).parent().parent().data 'id'
+                updates = {}
+                updates[$(this).data 'updatable'] = $(this).val()
+                $.post ajax.Endpoints, {
+                    action: 'category_synonyms_update_def'
+                    id
+                    updates
+                }
                 $(this)
                     .hide()
                     .prev()
@@ -25,8 +34,16 @@ jQuery ($)->
         $('.clicked2inputs')
             .off 'focusout'
             .on 'focusout', ->
+                id = $(this).parent().parent().data 'id'
                 terms = $(this).val().split(',')
                     .filter((v)->return v isnt '')
+                updates = {}
+                updates[$(this).data 'updatable'] = terms
+                $.post ajax.Endpoints, {
+                    action: 'category_synonyms_update_def'
+                    id
+                    updates
+                }
                 $(this)
                     .prev()
                     .children()
@@ -50,7 +67,7 @@ jQuery ($)->
         return result
 
 
-    # ajax entries
+    # ajax entries for all
     refreshEvents()
 
     $('input#doaction').on 'click', ->
