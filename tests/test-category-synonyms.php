@@ -133,7 +133,7 @@ class CategorySynonymsTest extends WP_UnitTestCase {
 	}
 
 
-	function test_of_get_synonyms_definition_by_id()
+	function test_of_get_defined_synonyms_by_id()
 	{
 		//provisioning
 		$ts = $this->categorySynonyms;
@@ -146,7 +146,7 @@ class CategorySynonymsTest extends WP_UnitTestCase {
 			'terms' => $synonymous_terms,
 		) );
 
-		$result = $ts->get_synonyms_definition_by_id( $registration_info['synonyms_definition_id'] );
+		$result = $ts->get_defined_synonyms_by_id( $registration_info['synonyms_definition_id'] );
 
 		$this->assertEquals( count( $result['term_taxonomy_ids'] ), count( $synonymous_terms ) );
 		$this->assertEquals( $result['taxonomy'], $tax_name );

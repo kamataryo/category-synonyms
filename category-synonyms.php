@@ -150,7 +150,7 @@ class CategorySynonyms {
     }
 
 
-    public function get_synonyms_definition_by_id( $synonyms_definition_id )
+    public function get_defined_synonyms_by_id( $synonyms_definition_id )
     {
         // simply read synonyms by synonyms_id and return synonyms object.
         $taxonomy = get_post_meta(
@@ -215,7 +215,7 @@ class CategorySynonyms {
     function get_all_definitions() {
 
         $synonyms_definitions = get_posts( array(
-            'number_posts' => -1,
+            'numberposts' => -1,
             'post_type'    => $this->post_type,
             'post_status'  => 'any',
         ) );
@@ -224,7 +224,7 @@ class CategorySynonyms {
 
         foreach ( $synonyms_definitions as $def ) {
 
-            $synonyms = $this->get_synonyms_definition_by_id( $def->ID );
+            $synonyms = $this->get_defined_synonyms_by_id( $def->ID );
             array_push( $result, array(
                 'synonyms_definition_id' => $def->ID,
                 'label'                  => $def->post_title,

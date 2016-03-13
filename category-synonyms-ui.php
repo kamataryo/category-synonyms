@@ -40,6 +40,39 @@
         ) );
     }
 
+    //define ajax action
+    function ajax_add_new_def()
+    {
+        global $categorySynonyms_instance;
+        $cs = $categorySynonyms_instance;
+        $def_id = $cs->register( array(
+            'label' => 'new',
+            'terms' => array(),
+            'taxonomy' => 'category'
+        ) )['synonyms_definition_id'];
+        $all_defs = $cs->get_all_definitions();
+        foreach ( $all_defs as $def ) {
+            if ( $def['synonyms_definition_id'] === $def_id ) {
+                admin_synonym_def_tr( $def );
+                die();
+            }
+        }
+    }
+    add_action( 'wp_ajax_category_synonyms_add_new', 'ajax_add_new_def' );
+
+
+    function ajax_delete_defs()
+    {
+        global $categorySynonyms_instance;
+        $cs = $categorySynonyms_instance;
+        $result = array();
+        foreach ($_POST['ids'] as $id) {
+            $result[$id] = $cs->unregister( $id ) ? true : false;
+        }
+        wp_send_json_success( $result );
+    }
+    add_action( 'wp_ajax_category_syonyms_delete_defs', 'ajax_delete_defs' );
+
 
     function describe_category_synonyms_options_ui()
     {
@@ -56,15 +89,6 @@
                 <?php echo esc_html__( 'Synonyms definitions', CATEGORY_SYNONYMS_TEXT_DOMAIN );  ?>
                 <a href="#" class="page-title-action click2add"><?php echo esc_html__( 'Add New Synonyms', CATEGORY_SYNONYMS_TEXT_DOMAIN ); ?></a>
             </h1>
-            <ul class="subsubsub">
-                <li class="all">
-                    <?php echo esc_html__( 'All' ); ?>
-                    <span class="count">
-                        (<?php echo count( $all_defs ); ?>)
-                    </span>
-                </li>
-            </ul>
-
 
             <input type="hidden"></input>
             <div class="tablenav top">
@@ -72,9 +96,9 @@
                     <label for="bulk-action-selector-top" class="screen-reader-text"><?php echo esc_html__( 'Select bulk action' ); ?></label>
                     <select name="action" id="bulk-action-selector-top">
                         <option value="-1"><?php echo esc_html__( 'Bulk Actions' ); ?></option>
-                    	<option value="trash"><?php echo esc_html__( 'Move to Trash' ); ?></option>
+                    	<option value="delete"><?php echo esc_html__( 'Delete' ); ?></option>
                     </select>
-                    <input type="submit" id="doaction" class="button action" value="<?php echo esc_html__( 'Apply' ); ?>">
+                    <input type="submit" id="doaction" class="button action" value="<?php echo esc_html__( 'Apply' ); ?>" data-onprocess="false">
                 </div>
             </div>
 
@@ -94,53 +118,11 @@
                 <tbody class="the-list">
 
                     <?php foreach ( $all_defs as $def ): ?>
-                    <?php #tr要素はテンプレートパーツ化する。ここでの出力と、ajaxでクライアント側に返すために用いる ?>
-                    <tr id="synonyms-<?php echo esc_html( $def['synonyms_definition_id'] ); ?>">
-                        <th scope="row" class="check-column">
-                            <label class="screen-reader-text" for="cb-select-<?php echo esc_html( $def['synonyms_definition_id'] ); ?>"><?php printf( esc_html__('Select %s'), $def['label'] ); ?></label>
-			                <input id="cb-select-<?php echo esc_html( $def['synonyms_definition_id'] ); ?>" type="checkbox" name="synonyms_def[]" value="<?php echo esc_html( $def['synonyms_definition_id'] ); ?>">
-			                <div class="locked-indicator"></div>
-		                </th>
-                        <td class="column-title title column-title has-row-actions column-primary page-title">
-                            <strong>
-                                <?php echo esc_html( $def['label'] ); ?>
-                            </strong>
-                            <button type="button" class="toggle-row"><span class="screen-reader-text"><?php echo esc_html__( 'Show more details' ); ?></span></button>
-                        </td>
-                        <td class="column-categories" data-colname="<?php echo esc_html__('taxonomy', CATEGORY_SYNONYMS_TEXT_DOMAIN); ?>">
-                            <span class="click2input"><?php echo esc_html( $def['taxonomy'] ); ?></span>
-                            <input type="text" name="clicked2input-taxonomy" class="clicked2input" value="<?php echo esc_html( $def['taxonomy'] ); ?>">
-                        </td>
-                        <td class="column-terms" data-colname="<?php echo esc_html__('terms', CATEGORY_SYNONYMS_TEXT_DOMAIN); ?>">
-                            <ul class="term-list click2inputs">
-                            <?php $terms = array();  ?>
-                            <?php foreach ( $def['terms'] as $term_id ): ?>
-                                <?php $term = get_term_by( 'id', $term_id, $def['taxonomy'] ); ?>
-                                <li>
-                                    <span><?php echo $term->name; ?></span>
-                                </li>
-                            <?php array_push( $terms, $term->name ); ?>
-                            <?php endforeach; ?>
-                            </ul>
-                            <input type="text" name="clicked2input-terms" class="clicked2inputs" value="<?php echo esc_html( implode( ',', $terms ) ); ?>">
-                        </td>
-                    </tr>
+                    <?php admin_synonym_def_tr( $def ); ?>
                     <?php endforeach; ?>
 
                 </tbody>
             </table>
-
-            <div class="tablenav bottom">
-    			<div class="alignleft actions">
-        			<label for="bulk-action-selector-bottom" class="screen-reader-text"><?php echo esc_html__( 'Select bulk action' ); ?></label>
-                    <select name="action2" id="bulk-action-selector-bottom">
-                        <option value="-1"><?php echo esc_html__( 'Bulk Actions' ); ?></option>
-        	            <option value="trash"><?php echo esc_html__( 'Move to Trash' ); ?></option>
-                    </select>
-                    <input type="submit" id="doaction2" class="button action" value="<?php echo esc_html__( 'Apply' ); ?>">
-    		    </div>
-		    </div>
-
 
 
             <?php else: ?>
@@ -153,6 +135,47 @@
 
 
     // set up template-tags
+
+    function admin_synonym_def_tr( $def )
+    {
+    ?>
+        <tr id="synonyms-<?php echo esc_html( $def['synonyms_definition_id'] ); ?>">
+            <th scope="row" class="check-column">
+                <label class="screen-reader-text" for="cb-select-<?php echo esc_html( $def['synonyms_definition_id'] ); ?>"><?php printf( esc_html__('Select %s'), $def['label'] ); ?></label>
+                <input id="cb-select-<?php echo esc_html( $def['synonyms_definition_id'] ); ?>" type="checkbox" name="synonyms_def[]" value="<?php echo esc_html( $def['synonyms_definition_id'] ); ?>">
+                <div class="locked-indicator"></div>
+            </th>
+            <td class="column-title title column-title has-row-actions column-primary page-title">
+                <strong>
+                    <?php echo esc_html( $def['label'] ); ?>
+                </strong>
+                <button type="button" class="toggle-row"><span class="screen-reader-text"><?php echo esc_html__( 'Show more details' ); ?></span></button>
+            </td>
+            <td class="column-categories" data-colname="<?php echo esc_html__('taxonomy', CATEGORY_SYNONYMS_TEXT_DOMAIN); ?>">
+                <span class="click2input"><?php echo esc_html( $def['taxonomy'] ); ?></span>
+                <input type="text" name="clicked2input-taxonomy" class="clicked2input" value="<?php echo esc_html( $def['taxonomy'] ); ?>">
+            </td>
+            <td class="column-terms" data-colname="<?php echo esc_html__('terms', CATEGORY_SYNONYMS_TEXT_DOMAIN); ?>">
+                <ul class="term-list click2inputs">
+                <?php $terms = array();  ?>
+                <?php if ( count( $def['terms'] ) === 0 ): ?>
+                    <li>+</li>
+                <?php else: ?>
+                    <?php foreach ( $def['terms'] as $term_id ): ?>
+                    <?php $term = get_term_by( 'id', $term_id, $def['taxonomy'] ); ?>
+                    <li>
+                        <span><?php echo $term->name; ?></span>
+                    </li>
+                    <?php array_push( $terms, $term->name ); ?>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+                </ul>
+                <input type="text" name="clicked2input-terms" class="clicked2inputs" value="<?php echo esc_html( implode( ',', $terms ) ); ?>">
+            </td>
+        </tr>
+    <?php
+    }
+
 
     function get_the_term_list_synonymously( $id, $taxonomy, $before, $sep, $after )
     {
